@@ -178,6 +178,12 @@ IMPORTANT: Only include items that are available in inventory. If you suggest a 
       );
     }
   } catch (error) {
-    return error;
+    // Always return a Response, not the error object directly
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    console.error('Error in AI Draft Quote API:', error);
+    return NextResponse.json(
+      { error: 'Internal server error', details: errorMessage },
+      { status: 500 }
+    );
   }
 } 
