@@ -36,3 +36,52 @@
 
 ### Invoices
 - Users can view all invoices and download each invoice as a PDF.
+
+# Cloud Forge Tech Stack Overview
+
+## Frontend Framework
+- **Next.js 15.3.1** (React framework)
+- **TypeScript** for type safety
+- **Tailwind CSS** for styling (evident from `className` usage)
+
+## State Management
+- **Redux Toolkit** for global state management
+- Organized into **feature-based slices** (quotes, shipments, inventory, etc.)
+- Uses `createAsyncThunk` for handling asynchronous operations
+
+## Backend/API
+- **Next.js API routes** for backend functionality
+- **Supabase** as the database and authentication provider
+- RESTful API endpoints for various resources:
+  - `/api/quotes`
+  - `/api/shipments`
+  - `/api/sales-orders`
+  - `/api/invoices`
+  - `/api/inventory`
+  - `/api/materials`
+  - `/api/grades`
+
+## Database Schema (based on API routes)
+- `quotes` table
+- `quote_line_items` table
+- `sales_orders` table
+- `shipments` table
+- `invoices` table
+- `inventory` table
+- `materials` table
+- `grades` table
+
+## Authentication
+- **Supabase authentication**
+- Custom middleware (`verifyUser`) for protecting API routes
+- **JWT-based authentication** with access tokens
+
+## Key Features
+- Quote management system
+- Sales order processing
+- Shipment tracking
+- Inventory management
+- Invoice generation
+- Material and grade cataloging
+
+
