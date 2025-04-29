@@ -1,36 +1,38 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Cloud Forge Application Overview
 
-## Getting Started
+## In this project:
 
-First, run the development server:
+### Login/Sign Up
+- Users can create a new account and securely log in.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+### Inventory Management
+- Users can view their full inventory catalog, add new inventory items, and edit existing ones.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### Build a Quote
+- Users can browse their inventory catalog, add items to a new quote, and click **"Build Quote"** to generate a formal quote.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### Upload RFQ (Request for Quote)
+- Users can upload an RFQ document. The system will automatically parse and present the RFQ information.
+- Users then have the option to:
+  - Manually build a quote based on the RFQ.
+  - Use AI to automatically match RFQ items to inventory.
+    - If no exact match is found, the AI will select the closest available material and note the substitution.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### Quotes Management
+- Users can view all existing quotes.
+- When a customer accepts a quote, users can click **"Accept Quote"** to automatically create a **Sales Order** and a **Shipment**.
+- Upon acceptance:
+  - Allocated stock increases by the ordered quantity.
+  - On-hand stock decreases accordingly.
 
-## Learn More
+### Sales Orders
+- Users can view all sales orders, including linked quotes and associated shipments.
 
-To learn more about Next.js, take a look at the following resources:
+### Shipments
+- Users can view and edit shipment details.
+- Executing a shipment:
+  - Generates an invoice.
+  - Decreases the allocated inventory.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+### Invoices
+- Users can view all invoices and download each invoice as a PDF.
