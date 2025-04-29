@@ -8,9 +8,10 @@ import { fetchQuote } from '@/store/slices/quotesSlice';
 import { fetchShipments } from '@/store/slices/shipmentsSlice';
 import SalesOrderCard from '@/components/ui/SalesOrderCard';
 import { toast } from 'sonner';
+import { AppDispatch } from "@/app/store";
 
 export default function SalesOrdersPage() {
-  const dispatch = useDispatch();
+  const dispatch = useDispatch<AppDispatch>();
   const { salesOrders, loading, error } = useSelector((state: RootState) => state.salesOrders);
 
   useEffect(() => {

@@ -1,5 +1,4 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import { useAppDispatch } from '@/store/hooks';
 import { supabase } from '@/lib/supabase';
 
 interface Shipment {
@@ -26,15 +25,21 @@ const initialState: ShipmentsState = {
 
 export const fetchShipments = createAsyncThunk(
   'shipments/fetchShipments',
-  async (salesOrderId: string) => {
+  async (salesOrderId?: string) => {
     const { data: sessionData } = await supabase.auth.getSession();
     const accessToken = sessionData.session?.access_token;
     if (!accessToken) throw new Error('No access token found. Please log in.');
-    const response = await fetch(`/api/sales-orders/${salesOrderId}/shipments`, {
+    
+    const url = salesOrderId 
+      ? `/api/sales-orders/${salesOrderId}/shipments`
+      : '/api/shipments';
+      
+    const response = await fetch(url, {
       headers: {
         'Authorization': `Bearer ${accessToken}`,
       },
     });
+    
     if (!response.ok) {
       throw new Error('Failed to fetch shipments');
     }

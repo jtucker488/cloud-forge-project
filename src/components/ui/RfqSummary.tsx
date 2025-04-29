@@ -26,13 +26,26 @@ interface RfqSummaryProps {
   onBuildManually?: () => void;
   onBuildWithAI?: () => void;
   isAIProcessing?: boolean;
+  onFileUpload?: (file: File) => void;
 }
 
-export default function RfqSummary({ summary, onBuildManually, onBuildWithAI, isAIProcessing = false }: RfqSummaryProps) {
+export default function RfqSummary({ 
+  summary, 
+  onBuildManually, 
+  onBuildWithAI, 
+  isAIProcessing = false,
+  onFileUpload 
+}: RfqSummaryProps) {
   const router = useRouter();
   const [dragActive, setDragActive] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+
+  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0] && onFileUpload) {
+      onFileUpload(e.target.files[0]);
+    }
+  };
 
   const handleBuildManually = () => {
     if (onBuildManually) {

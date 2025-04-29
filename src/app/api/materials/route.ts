@@ -1,4 +1,3 @@
-// src/app/api/materials/route.ts
 import { NextResponse } from 'next/server';
 import { supabase } from '@/lib/supabase';
 import { verifyUser } from '@/lib/authMiddleware';
@@ -9,7 +8,7 @@ export async function GET(request: Request) {
     
     const { data, error } = await supabase
       .from('materials')
-      .select('*')
+      .select('*');
 
     if (error) {
       return NextResponse.json({ error: error.message }, { status: 500 });
@@ -17,6 +16,10 @@ export async function GET(request: Request) {
 
     return NextResponse.json(data, { status: 200 });
   } catch (error) {
-    return error;
+    console.error('Error fetching materials:', error);
+    return NextResponse.json(
+      { error: 'Internal server error' },
+      { status: 500 }
+    );
   }
 }

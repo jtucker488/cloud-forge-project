@@ -1,4 +1,4 @@
-import { NextResponse } from 'next/server';
+import { NextResponse} from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
@@ -7,10 +7,10 @@ const supabase = createClient(supabaseUrl, supabaseKey);
 
 export async function GET(
   request: Request,
-  { params }: { params: { invoiceId: string } }
+  context: any    // <--- same here
 ) {
   try {
-    const invoiceId = Number(params.invoiceId);
+    const invoiceId = Number(context.params.invoiceId);
     console.log('Fetching invoice with ID:', invoiceId);
 
     // 1. Fetch invoice
@@ -19,9 +19,7 @@ export async function GET(
       .select('*')
       .eq('id', invoiceId)
       .single();
-    console.log('Invoice:', invoice, 'Error:', invoiceError);
     if (invoiceError || !invoice) {
-      console.log('Invoice not found or error:', invoiceError);
       return NextResponse.json({ error: 'Invoice not found' }, { status: 404 });
     }
 
@@ -31,9 +29,7 @@ export async function GET(
       .select('*')
       .eq('id', invoice.shipment_id)
       .single();
-    console.log('Shipment:', shipment, 'Error:', shipmentError);
     if (shipmentError || !shipment) {
-      console.log('Shipment not found or error:', shipmentError);
       return NextResponse.json({ error: 'Shipment not found' }, { status: 404 });
     }
 
@@ -43,9 +39,7 @@ export async function GET(
       .select('*')
       .eq('id', shipment.sales_order_id)
       .single();
-    console.log('SalesOrder:', salesOrder, 'Error:', salesOrderError);
     if (salesOrderError || !salesOrder) {
-      console.log('Sales order not found or error:', salesOrderError);
       return NextResponse.json({ error: 'Sales order not found' }, { status: 404 });
     }
 
@@ -54,9 +48,7 @@ export async function GET(
       .from('quote_line_items')
       .select('*')
       .eq('quote_id', salesOrder.quote_id);
-    console.log('LineItems:', lineItems, 'Error:', lineItemsError);
     if (lineItemsError) {
-      console.log('Line items error:', lineItemsError);
       return NextResponse.json({ error: 'Failed to fetch line items' }, { status: 500 });
     }
 
@@ -70,4 +62,4 @@ export async function GET(
     console.error('Error in /api/invoices/[invoiceId]:', err);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
-} 
+}

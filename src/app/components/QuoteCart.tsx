@@ -37,7 +37,7 @@ export function QuoteCart() {
     try {
       // Format line items for the quote
       const lineItems = items.map(item => ({
-        material_id: item.material_id,
+        material_id: Number(item.material_id),  // <-- FIX: make it a number
         material_name: item.material_name,
         grade: item.grade_name,
         dimensions: [
@@ -51,11 +51,14 @@ export function QuoteCart() {
         subtotal_price: 100 * item.quantity
       }));
 
+      const total_price = lineItems.reduce((sum, item) => sum + item.subtotal_price, 0);
+
       const result = await dispatch(createQuote({
         customer_name: customerName,
         notes: notes,
         status: 'draft',
-        line_items: lineItems
+        line_items: lineItems,
+        total_price: total_price
       })).unwrap();
 
       // Navigate to the quote summary page

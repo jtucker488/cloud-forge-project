@@ -1,4 +1,3 @@
-// src/app/api/inventory/route.ts
 import { NextResponse } from 'next/server';
 import { supabase } from '@/lib/supabase';
 import { verifyUser } from '@/lib/authMiddleware';
@@ -18,7 +17,8 @@ export async function GET(request: Request) {
 
     return NextResponse.json(data, { status: 200 });
   } catch (error) {
-    return error;
+    console.error(error);
+    return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
   }
 }
 
@@ -27,15 +27,10 @@ export async function POST(request: Request) {
     const userId = await verifyUser(request);
     const body = await request.json();
     
-    // Validate required fields
     if (!body.material || !body.grade || !body.length || !body.width || !body.thickness) {
-      return NextResponse.json(
-        { error: 'Missing required fields' },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
     }
 
-    // Convert string values to numbers
     const inventoryData = {
       material_id: Number(body.material),
       grade_id: Number(body.grade),
@@ -48,7 +43,6 @@ export async function POST(request: Request) {
       user_id: userId
     };
 
-    // First, verify that the grade exists and belongs to the material
     const { data: gradeData, error: gradeError } = await supabase
       .from('grades')
       .select('id, material_id')
@@ -56,10 +50,7 @@ export async function POST(request: Request) {
       .single();
 
     if (gradeError || !gradeData || gradeData.material_id !== inventoryData.material_id) {
-      return NextResponse.json(
-        { error: 'Invalid grade selection' },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: 'Invalid grade selection' }, { status: 400 });
     }
 
     const { data, error } = await supabase
@@ -74,7 +65,8 @@ export async function POST(request: Request) {
 
     return NextResponse.json(data, { status: 201 });
   } catch (error) {
-    return error;
+    console.error(error);
+    return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
   }
 }
 
@@ -100,6 +92,7 @@ export async function DELETE(request: Request) {
     
     return NextResponse.json({ success: true }, { status: 200 });
   } catch (error) {
-    return error;
+    console.error(error);
+    return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
   }
 }

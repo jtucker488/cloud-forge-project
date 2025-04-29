@@ -46,7 +46,9 @@ export async function POST(request: Request) {
       .select()
       .single();
 
-    if (salesOrderError) throw salesOrderError;
+    if (salesOrderError) {
+      return NextResponse.json({ error: salesOrderError.message }, { status: 500 });
+    }
 
     // Insert a draft shipment linked to the new sales order
     const { data: shipment, error: shipmentError } = await supabase
@@ -60,10 +62,13 @@ export async function POST(request: Request) {
       .select()
       .single();
 
-    if (shipmentError) throw shipmentError;
+    if (shipmentError) {
+      return NextResponse.json({ error: shipmentError.message }, { status: 500 });
+    }
 
     return NextResponse.json({ salesOrder, shipment });
   } catch (error) {
-    return error;
+    console.error(error);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

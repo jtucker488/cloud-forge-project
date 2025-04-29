@@ -9,6 +9,15 @@ interface Quote {
   status: 'draft' | 'sent' | 'accepted' | 'rejected';
   total_price: number;
   notes?: string;
+  line_items?: Array<{
+    material_id: number;
+    material_name: string;
+    grade: string;
+    dimensions: string;
+    quantity: number;
+    unit_price: number;
+    subtotal_price: number;
+  }>;
 }
 
 interface QuotesState {

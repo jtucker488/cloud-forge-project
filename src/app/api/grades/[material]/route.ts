@@ -1,5 +1,5 @@
 import { createClient } from '@supabase/supabase-js';
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
@@ -10,12 +10,13 @@ if (!supabaseUrl || !supabaseKey) {
 
 const supabase = createClient(supabaseUrl, supabaseKey);
 
-export async function GET(
-  request: Request,
-  { params }: { params: { material: string } }
-) {
+export async function GET(request: NextRequest) {
   try {
-    const materialId = Number(params.material);
+    const url = new URL(request.url);
+    const segments = url.pathname.split('/');
+    const material = segments[segments.length - 2]; // Get the `[material]` param
+
+    const materialId = Number(material);
     if (isNaN(materialId)) {
       return NextResponse.json({ error: 'Invalid material ID' }, { status: 400 });
     }
@@ -34,9 +35,6 @@ export async function GET(
     return NextResponse.json(data);
   } catch (error) {
     console.error('Error in grades by material API route:', error);
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
-} 
+}

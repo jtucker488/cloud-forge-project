@@ -16,9 +16,16 @@ export async function GET(request: Request) {
       .eq('user_id', userId)
       .order('invoice_date', { ascending: false });
       
-    if (error) throw error;
-    return NextResponse.json(data);
+    if (error) {
+      return NextResponse.json({ error: error.message }, { status: 500 });
+    }
+
+    return NextResponse.json(data, { status: 200 });
   } catch (error) {
-    return error;
+    console.error('Error in GET /api/invoices:', error);
+    return NextResponse.json(
+      { error: 'Internal server error' },
+      { status: 500 }
+    );
   }
-} 
+}

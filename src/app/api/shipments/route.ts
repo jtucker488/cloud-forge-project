@@ -9,17 +9,21 @@ const supabase = createClient(supabaseUrl, supabaseKey);
 export async function GET(request: Request) {
   try {
     const userId = await verifyUser(request);
-    
+
     const { data, error } = await supabase
       .from('shipments')
       .select('*')
       .eq('user_id', userId)
       .order('created_at', { ascending: false });
 
-    if (error) throw error;
+    if (error) {
+      console.error('Failed fetching shipments:', error);
+      return NextResponse.json({ error: error.message }, { status: 500 });
+    }
 
     return NextResponse.json(data);
   } catch (error) {
-    return error;
+    console.error('Error fetching shipments:', error);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
-} 
+}

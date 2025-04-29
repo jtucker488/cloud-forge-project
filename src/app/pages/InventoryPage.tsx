@@ -16,7 +16,7 @@ import {
 } from "@/app/redux/slices/materialsSlice";
 import {
   fetchInventory,
-  selectInventoryArray,
+  selectInventory,
 } from "@/app/redux/slices/inventorySlice";
 import { useAppDispatch } from "@/app/store/hooks";
 import { useSelector } from "react-redux";

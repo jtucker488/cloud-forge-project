@@ -6,87 +6,64 @@ const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
 const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
-export async function GET(
-  request: NextRequest,
-  { params }: { params: { invoiceId: string } }
-) {
+export async function GET(request: NextRequest) {
   try {
-    // Verify user authentication
-    await verifyUser(request);
+    console.log('GET /api/invoices/[invoiceId]/line-items called');
+    const userId = await verifyUser(request);
+    console.log('Verified userId:', userId);
 
-    const invoiceId = params.invoiceId;
+    // Parse invoiceId manually
+    const url = new URL(request.url);
+    const segments = url.pathname.split('/');
+    const invoiceId = segments[segments.length - 3]; // <- ⚡ 3rd from end (/api/invoices/[invoiceId]/line-items)
 
-    // 1. Get the shipment_id from the invoice
+    console.log('Parsed invoiceId param:', invoiceId);
+
     const { data: invoice, error: invoiceError } = await supabase
       .from('invoices')
       .select('shipment_id')
       .eq('id', invoiceId)
       .single();
-    console.log('invoice:', invoice);
     if (invoiceError || !invoice) {
-      console.error('Invoice fetch error:', invoiceError, 'InvoiceId:', invoiceId);
-      return NextResponse.json(
-        { error: 'Invoice not found' },
-        { status: 404 }
-      );
+      return NextResponse.json({ error: 'Invoice not found' }, { status: 404 });
     }
 
-    // 2. Get the full shipment record
     const { data: shipment, error: shipmentError } = await supabase
       .from('shipments')
-      .select('*')
+      .select('sales_order_id')
       .eq('id', invoice.shipment_id)
       .single();
-    console.log('shipment:', shipment);
     if (shipmentError || !shipment) {
-      console.error('Shipment fetch error:', shipmentError, 'ShipmentId:', invoice.shipment_id);
-      return NextResponse.json(
-        { error: 'Shipment not found' },
-        { status: 404 }
-      );
+      return NextResponse.json({ error: 'Shipment not found' }, { status: 404 });
     }
 
-    // 3. Get the quote_id from the sales order
     const { data: salesOrder, error: salesOrderError } = await supabase
       .from('sales_orders')
       .select('quote_id')
       .eq('id', shipment.sales_order_id)
       .single();
-    console.log('salesOrder:', salesOrder);
     if (salesOrderError || !salesOrder) {
-      console.error('Sales order fetch error:', salesOrderError, 'SalesOrderId:', shipment.sales_order_id);
-      return NextResponse.json(
-        { error: 'Sales order not found' },
-        { status: 404 }
-      );
+      return NextResponse.json({ error: 'Sales order not found' }, { status: 404 });
     }
 
-    // 4. Get the line items from the associated quote
     const { data: lineItems, error: lineItemsError } = await supabase
       .from('quote_line_items')
       .select('*')
       .eq('quote_id', salesOrder.quote_id)
       .order('id', { ascending: true });
     if (lineItemsError) {
-      console.error('Line items fetch error:', lineItemsError, 'QuoteId:', salesOrder.quote_id);
-      return NextResponse.json(
-        { error: 'Failed to fetch line items' },
-        { status: 500 }
-      );
+      return NextResponse.json({ error: 'Failed to fetch line items' }, { status: 500 });
     }
 
-    // Return both line items and shipment details
     return NextResponse.json({
       lineItems: Array.isArray(lineItems) ? lineItems : [],
-      shipment
+      shipment,
     });
-  } catch (error: any) {
-    console.error('API route error:', error);
-    if (error instanceof NextResponse) {
-      return error;
-    }
+  } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    console.error('Error in GET /api/invoices/[invoiceId]/line-items:', error);
     return NextResponse.json(
-      { error: 'Internal server error' },
+      { error: 'Internal server error', details: errorMessage },
       { status: 500 }
     );
   }
